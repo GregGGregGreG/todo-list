@@ -4,8 +4,26 @@
     <meta charset="UTF-8">
     <title>TODO-LIST</title>
     <link href="css/app.css" rel="stylesheet">
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+    <link href="node_modules/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="node_modules/autosize/dest/autosize.min.js"></script>
 </head>
 <body>
-
+<div id="todoList"></div>
+<script src="js/jquery.todo-list.js"></script>
+<script>
+    $(function () {
+        $('#todoList').todoList({
+            inputClass: 'form-control',
+            btnAddClass: 'btn btn-success',
+            inputGroupClass: 'input-group',
+            inputGroupBtnClass: 'input-group-btn',
+            liTodoClass: 'col-md-12 list-group-item',
+            btnDoneTaskClass: 'glyphicon glyphicon-ok',
+            btnRemoveTaskClass: 'glyphicon glyphicon-remove',
+            btnEditTaskClass: 'btn btn-default'
+        });
+    })
+</script>
 </body>
 </html>
