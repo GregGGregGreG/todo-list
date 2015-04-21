@@ -183,7 +183,7 @@
             $editTask.toggle(event.type === 'mouseenter');
             $task.toggle(event.type === 'mouseleave');
 
-            $li.find('#' + $this.config.btnSaveEditTask).prop('disabled', true);
+            $li.find('#' + $this.config.btnSaveEditTaskId).prop('disabled', true);
 
             $li.find('#' + $this.config.btnRemoveTaskId).toggle(event.type === 'mouseenter');
             $li.find('#' + $this.config.btnDoneTaskId).toggle(event.type === 'mouseenter');
@@ -214,12 +214,13 @@
         }).html(util.formatText(this.$input.val() || str))
             .appendTo(this.$li);
 
-        this.$buttonDone = $('<span/>', {
+        this.$buttonDone = $('<input/>', {
+            type:'checkbox',
             id: this.config.btnDoneTaskId,
             class: this.config.btnDoneTaskClass
         }).appendTo(this.$li);
 
-        this.$buttonEdit = $('<button/>', {
+        this.$buttonEdit = $('<span/>', {
             id: this.config.btnSaveEditTaskId,
             class: this.config.btnEditTaskClass
         }).addClass(this.config.btnEditTaskClass)
@@ -256,7 +257,8 @@
         }).html(util.formatText(str))
             .appendTo(this.$li);
 
-        this.$buttonDone = $('<span/>', {
+        this.$buttonDone = $('<input/>', {
+            type:'checkbox',
             id: this.config.btnDoneTaskId,
             class: this.config.btnDoneTaskClass
         }).appendTo(this.$li);
