@@ -2,31 +2,35 @@
  * Created by greg on 21.04.15.
  */
 (function ($) {
-    var util = {
-        formatText: function (str) {
-            var removeFirstSpace = /^[ \t]*/gm;
-            var removeDuplicateSpace = /[ \t]{2,}/gm;
-            var removeBlankRows = /^\n{3,}/gm;
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    var removeFirstSpace = /^[ \t]*/gm;
+    var removeDuplicateSpace = /[ \t]{2,}/gm;
+    var removeBlankRows = /^\n{3,}/gm;
 
+    function TodoListUtilService() {
+        return {
+            formatText: formatText,
+            getDate: getDate,
+            switchValueTask: switchValueTask
+        };
+        function formatText(str) {
             return str.replace(removeFirstSpace, '')
                 .trim()
                 .replace(removeDuplicateSpace, ' ')
                 .replace(removeBlankRows, '\n')
                 .replace(/\n/gm, "<br />\n");
-        },
-        getDate: function () {
-            var monthNames = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
+        }
 
-            var date = new Date().getDate();
-            var month = monthNames[new Date().getMonth()];
-            var year = new Date().getFullYear();
-            var time = new Date().toLocaleTimeString();
+        function getDate(date) {
+            return date.getDate() + ' ' +
+                monthNames[date.getMonth()] + ' ' +
+                date.getFullYear() + ' | ' +
+                date.toLocaleTimeString();
+        }
 
-            return date + ' ' + month + ' ' + ' ' + year + ' | ' + time;
-        },
-        switchValueTask: function (from, to) {
+        function switchValueTask(from, to) {
             var str = from.val() === '' ?
                 from.text() :
                 util.formatText(from.val());
@@ -46,7 +50,7 @@
                 from.height(height);
             }
         }
-    };
+    }
 
     var defaults = {
         btnAddText: 'Add',
@@ -118,7 +122,7 @@
         };
 
         this.$task = function (str) {
-            return $('<div/>', {id: this.config.taskId}).html(util.formatText(str));
+            return $('<div/>', {id: this.config.taskId}).html(TodoListUtilService().formatText(str));
         };
 
         this.$textAreaEditTask = function () {
@@ -156,7 +160,7 @@
         this.$dateAddingTask = function () {
             return $('<span/>', {
                 id: this.config.dateAddingTask,
-                text: util.getDate()
+                text: TodoListUtilService().getDate(new Date)
             });
         };
     };
@@ -236,7 +240,7 @@
             $li.find('#' + this.config.btnRemoveTaskId).toggle(event.type === 'mouseenter');
             $li.find('#' + this.config.btnDoneTaskId).toggle(event.type === 'mouseenter');
         } else {
-            util.switchValueTask($task, $editTask);
+            TodoListUtilService().switchValueTask($task, $editTask);
 
             $editTask.toggle(event.type === 'mouseenter');
             $task.toggle(event.type === 'mouseleave');
