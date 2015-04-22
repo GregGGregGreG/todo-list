@@ -33,7 +33,7 @@
         function switchValueTask(from, to) {
             var str = from.val() === '' ?
                 from.text() :
-                util.formatText(from.val());
+                formatText(from.val());
             //Use switch where value task from hover to static task
             if (from.val() === '') {
                 to.val(str);
@@ -264,7 +264,7 @@
         var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
         var $task = $li.find('#' + this.config.taskId);
 
-        util.switchValueTask($editTask, $task);
+        TodoListUtilService().switchValueTask($editTask, $task);
 
         $li.find('#' + this.config.btnSaveEditTaskId).prop('disabled', true);
     };
