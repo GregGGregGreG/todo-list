@@ -174,7 +174,7 @@
     }
 
     function bindEvents() {
-        this.$btnAdd.on('click', this.createTask.bind(this.$input.val()));
+        this.$btnAdd.on('click', this.createTask.bind(this));
         this.$input.keyup(this.inputKeyUp.bind(this));
         this.$todoList.delegate('#' + this.config.textAreaEditTaskId, 'keyup', this.updateKeyUp.bind(this));
         this.$todoList.delegate('#' + this.config.btnDoneTaskId, 'click', this.done.bind(this));
@@ -186,7 +186,7 @@
     function createTask(str) {
         $(this.$li()).prependTo(this.$todoList).append(
             $(this.$textAreaEditTask()).hide(),
-            $(this.$task(str)),
+            $(this.$task(str || $(event.target).find('input').val())),
             $(this.$buttonDone()),
             $(this.$buttonEdit()),
             $(this.$buttonRemove()),
