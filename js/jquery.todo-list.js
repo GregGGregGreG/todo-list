@@ -2,12 +2,14 @@
  * Created by greg on 21.04.15.
  */
 (function ($) {
+    var enterBtnKeyCode = 13;
     var monthNames = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
     var removeFirstSpace = /^[ \t]*/gm;
     var removeDuplicateSpace = /[ \t]{2,}/gm;
     var removeBlankRows = /^\n{3,}/gm;
+    var util = TodoListUtilService();
 
     function TodoListUtilService() {
         return {
@@ -16,8 +18,8 @@
             switchValueTask: switchValueTask
         };
         function formatText(str) {
-            return str.replace(removeFirstSpace, '')
-                .trim()
+            return str.trim()
+                .replace(removeFirstSpace, '')
                 .replace(removeDuplicateSpace, ' ')
                 .replace(removeBlankRows, '\n')
                 .replace(/\n/gm, "<br />\n");
@@ -31,23 +33,16 @@
         }
 
         function switchValueTask(from, to) {
-            var str = from.val() === '' ?
-                from.text() :
-                formatText(from.val());
+            var str = !from.val() ? from.text() : formatText(from.val());
             //Use switch where value task from hover to static task
-            if (from.val() === '') {
-                to.val(str);
-
-                var height = from.height();
-                to.height(height);
+            if (!from.val()) {
+                //to.val(str);
+                to.val(str).height(from.height());
             } else {
                 //Use switch where value task for save edit task
                 to.html(str);
                 //
-                from.val(to.text());
-
-                var height = to.height();
-                from.height(height);
+                from.val(to.text()).height(to.height());
             }
         }
     }
@@ -86,7 +81,20 @@
         this.showMessage();
     }
 
-    TodoList.prototype.init = function () {
+    TodoList.prototype.init = init;
+    TodoList.prototype.bindEvents = bindEvents;
+    TodoList.prototype.createTask = createTask;
+    TodoList.prototype.createDoneTask = createDoneTask;
+    TodoList.prototype.updateKeyUp = updateKeyUp;
+    TodoList.prototype.inputKeyUp = inputKeyUp;
+    TodoList.prototype.toggle = toggle;
+    TodoList.prototype.done = done;
+    TodoList.prototype.update = update;
+    TodoList.prototype.destroy = destroy;
+    TodoList.prototype.showMessage = showMessage;
+    TodoList.prototype.listIsEmpty = listIsEmpty;
+
+    function init() {
 
         this.$inputGroup = $('<div/>', {class: this.config.inputGroupClass}).appendTo(this.element);
 
@@ -122,7 +130,7 @@
         };
 
         this.$task = function (str) {
-            return $('<div/>', {id: this.config.taskId}).html(TodoListUtilService().formatText(str));
+            return $('<div/>', {id: this.config.taskId}).html(util.formatText(str));
         };
 
         this.$textAreaEditTask = function () {
@@ -160,12 +168,12 @@
         this.$dateAddingTask = function () {
             return $('<span/>', {
                 id: this.config.dateAddingTask,
-                text: TodoListUtilService().getDate(new Date)
+                text: util.getDate(new Date)
             });
         };
-    };
+    }
 
-    TodoList.prototype.bindEvents = function () {
+    function bindEvents() {
         this.$btnAdd.on('click', this.createTask.bind(this.$input.val()));
         this.$input.keyup(this.inputKeyUp.bind(this));
         this.$todoList.delegate('#' + this.config.textAreaEditTaskId, 'keyup', this.updateKeyUp.bind(this));
@@ -173,9 +181,9 @@
         this.$todoList.delegate('#' + this.config.btnSaveEditTaskId, 'click', this.update.bind(this));
         this.$todoList.delegate('#' + this.config.btnRemoveTaskId, 'click', this.destroy.bind(this));
         this.$todoList.delegate('li', 'mouseenter mouseleave', this.toggle.bind(this));
-    };
+    }
 
-    TodoList.prototype.createTask = function (str) {
+    function createTask(str) {
         $(this.$li()).prependTo(this.$todoList).append(
             $(this.$textAreaEditTask()).hide(),
             $(this.$task(str)),
@@ -188,18 +196,18 @@
         autosize($('#' + this.config.textAreaEditTaskId));
         this.$input.val('');
         this.showMessage();
-    };
+    }
 
-    TodoList.prototype.createDoneTask = function (str) {
+    function createDoneTask(str) {
         $(this.$li()).css({'color': '#999999'}).appendTo(this.$todoList).append(
             $(this.$task(str)).css({'text-decoration': 'line-through'}),
             $(this.$buttonDone()).prop('checked', true),
             $(this.$buttonRemove())
         );
         this.$input.focus();
-    };
+    }
 
-    TodoList.prototype.updateKeyUp = function () {
+    function updateKeyUp() {
         var $li = $(event.target).closest('li');
         var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
         var $btnSaveEditTask = $li.find('#' + this.config.btnSaveEditTaskId);
@@ -217,76 +225,75 @@
         if (str != editStr) {
             $btnSaveEditTask.prop('disabled', false);
         }
-    };
+    }
 
-    TodoList.prototype.inputKeyUp = function (e) {
-        var enterBtnKeyCode = 13;
-        var currentKeyCode = e.keyCode;
-
+    function inputKeyUp(e) {
         if (!$(event.target).val().trim()) {
             this.$btnAdd.prop('disabled', true);
-        } else if (currentKeyCode === enterBtnKeyCode) {
+        } else if (e.keyCode === enterBtnKeyCode) {
             this.createTask($(event.target).val());
             this.$btnAdd.prop('disabled', true);
-        } else  this.$btnAdd.prop('disabled', false);
-    };
+        } else this.$btnAdd.prop('disabled', false);
+    }
 
-    TodoList.prototype.toggle = function (event) {
+    function toggle(event) {
+        var eventType = event.type;
         var $li = $(event.target).closest('li');
         var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
         var $task = $li.find('#' + this.config.taskId);
 
         if ($li.find('#' + this.config.btnDoneTaskId).is(":checked")) {
-            $li.find('#' + this.config.btnRemoveTaskId).toggle(event.type === 'mouseenter');
-            $li.find('#' + this.config.btnDoneTaskId).toggle(event.type === 'mouseenter');
+            $li.find('#' + this.config.btnRemoveTaskId).toggle(eventType === 'mouseenter');
+            $li.find('#' + this.config.btnDoneTaskId).toggle(eventType === 'mouseenter');
         } else {
-            TodoListUtilService().switchValueTask($task, $editTask);
+            util.switchValueTask($task, $editTask);
 
-            $editTask.toggle(event.type === 'mouseenter');
-            $task.toggle(event.type === 'mouseleave');
+            $editTask.toggle(eventType === 'mouseenter');
+            $task.toggle(eventType === 'mouseleave');
 
             $li.find('#' + this.config.btnSaveEditTaskId).prop('disabled', true);
 
-            $li.find('#' + this.config.btnRemoveTaskId).toggle(event.type === 'mouseenter');
-            $li.find('#' + this.config.btnDoneTaskId).toggle(event.type === 'mouseenter');
-            $li.find('#' + this.config.btnSaveEditTaskId).toggle(event.type === 'mouseenter');
+            $li.find('#' + this.config.btnRemoveTaskId).toggle(eventType === 'mouseenter');
+            $li.find('#' + this.config.btnDoneTaskId).toggle(eventType === 'mouseenter');
+            $li.find('#' + this.config.btnSaveEditTaskId).toggle(eventType === 'mouseenter');
         }
-    };
+    }
 
-    TodoList.prototype.done = function () {
+    function done() {
         var $str = $(event.target).closest('li').find('#' + this.config.taskId).text();
         $(event.target).closest('li').remove();
         $(event.target).is(":checked") ? this.createDoneTask($str) : this.createTask($str);
-    };
+    }
 
-    TodoList.prototype.update = function () {
+    function update() {
         var $li = $(event.target).closest('li');
         var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
         var $task = $li.find('#' + this.config.taskId);
 
-        TodoListUtilService().switchValueTask($editTask, $task);
+        util.switchValueTask($editTask, $task);
 
         $li.find('#' + this.config.btnSaveEditTaskId).prop('disabled', true);
-    };
+    }
 
-    TodoList.prototype.destroy = function () {
+    function destroy() {
         if (confirm('Do you want delete ID_TASK?')) {
             $(event.target).closest('li').slideToggle(300).remove();
             this.showMessage();
         }
-    };
+    }
 
-    TodoList.prototype.showMessage = function () {
+    function showMessage() {
         this.$input.focus();
         this.listIsEmpty() ? this.$messageUser.fadeIn(500) : this.$messageUser.hide();
-    };
+    }
 
-    TodoList.prototype.listIsEmpty = function () {
+    function listIsEmpty() {
         return this.$todoList.children().length === 0;
-    };
+    }
 
     $.fn.todoList = function (optioons) {
-        new TodoList(this.first(), optioons);
-        return this.first();
+        var element = this.first();
+        new TodoList(element, optioons);
+        return element;
     }
 }(jQuery));
