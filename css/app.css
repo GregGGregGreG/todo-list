@@ -7,6 +7,7 @@ li{
 
 #task {
     overflow: auto;
+    word-wrap: break-word;
 }
 
 #task,

@@ -104,10 +104,12 @@
 
         this.$inputGroup = $('<div/>', {class: this.config.inputGroupClass}).appendTo(this.element);
 
-        this.$input = $('<input/>', {
+        this.$input = $('<textarea/>', {
             id: this.config.inputId,
             class: this.config.inputClass
         }).focus().appendTo(this.$inputGroup);
+        //Set aotosize input field
+        autosize($('#' + this.config.inputId));
 
         this.$inputGroupBtn = $('<span/>', {
             class: this.config.inputGroupBtnClass
@@ -193,9 +195,10 @@
     }
 
     /**
-     * Create li for task , button done, update ,and destroy.
+     * Create li with task , button done, update ,and destroy.
      * Adding for date creating.
      * @param str
+     * @returns  {html element li}
      */
     function createTaskHtml(str) {
         return $(this.$li()).append(
@@ -208,6 +211,11 @@
         );
     }
 
+    /**
+     * Create li with task,button destroy and done.
+     * @param str
+     * @returns {html element li}
+     */
     function createDoneTaskHtml(str) {
         return $(this.$li()).css({'color': '#999999'}).append(
             $(this.$task(str)).css({'text-decoration': 'line-through'}),
@@ -222,6 +230,7 @@
 
         autosize($('#' + this.config.textAreaEditTaskId));
         this.$input.val('');
+        this.$input.css('height', '54px');
         this.$btnAdd.prop('disabled', true);
         this.showMessage();
     }
@@ -240,7 +249,6 @@
         this.createTaskHtml(str).prependTo(this.$todoList);
         autosize($('#' + this.config.textAreaEditTaskId));
     }
-
 
     function updateKeyUp() {
         var $li = $(event.target).closest('li');
@@ -265,7 +273,7 @@
     function inputKeyUp(e) {
         if (!$(event.target).val().trim()) {
             this.$btnAdd.prop('disabled', true);
-        } else if (e.keyCode === enterBtnKeyCode) {
+        } else if (e.ctrlKey && e.keyCode === enterBtnKeyCode) {
             this.addTask($(event.target).val());
             this.$btnAdd.prop('disabled', true);
         } else this.$btnAdd.prop('disabled', false);
@@ -295,6 +303,9 @@
     }
 
     /**
+     * The task gets done. It becomes the end of the list. Remove buttons
+     * editing and creation date
+     *
      * Set task done.
      */
     function done() {
@@ -304,6 +315,7 @@
     }
 
     /**
+     *
      * Update text task
      */
     function update() {
@@ -317,11 +329,13 @@
     }
 
     /**
+     * Remove select task  from todo-list.
+     * Show message from user if is empty todo-list
      * Destroy task.
      */
     function destroy() {
         if (confirm('Do you want delete ID_TASK?')) {
-            $(event.target).closest('li').slideToggle(300).remove();
+            $(event.target).closest('li').remove();
             this.showMessage();
         }
     }
