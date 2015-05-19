@@ -76,6 +76,7 @@
         btnDoneTaskId: 'btn-done',
         btnRemoveTaskId: 'btn-remove',
         btnSaveEditTaskId: 'btn-edit',
+        messageUserId: 'message-user',
 
         inputClass: 'input',
         btnAddClass: 'btn-add',
@@ -129,10 +130,6 @@
         //Set aotosize input field
         autosize($('#' + this.config.inputId));
 
-        //this.$inputGroupBtn = $('<span/>', {
-        //    class: this.config.inputGroupBtnClass
-        //}).appendTo(this.$inputGroup);
-
         this.$btnAdd = $('<button/>', {
             text: this.config.btnAddText,
             id: this.config.btnAddId,
@@ -142,7 +139,8 @@
 
         this.$messageUser = $('<h3/>', {
             text: this.config.messageUserText,
-            class: this.config.messageUserClass
+            class: this.config.messageUserClass,
+            id: this.config.messageUserId,
         }).hide().appendTo(this.element);
 
         this.$todoList = $('<ul/>', {
@@ -282,7 +280,7 @@
      * Event for text area set task when editing.
      * If you hover over the text of the content is copied to the task tekst area and becomes editable
      */
-    function updateKeyUp() {
+    function updateKeyUp(e) {
         var $li = $(event.target).closest('li');
         var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
         var $btnSaveEditTask = $li.find('#' + this.config.btnSaveEditTaskId);
@@ -299,6 +297,10 @@
 
         if (str != editStr) {
             $btnSaveEditTask.prop('disabled', false);
+        }
+
+        if(e.ctrlKey && e.keyCode === enterBtnKeyCode){
+            this.update();
         }
     }
 
@@ -366,17 +368,19 @@
     }
 
     /**
-     * Show modal window.
-     * Remove select task  from todo-list.
+     * Show modal window.Focus in delete button
+     * Remove select task with slide toogle from todo-list.
      * Show message from user if is empty todo-list
      * Destroy task.
      */
     function destroy() {
-        var li = $(event.target).closest('li');
         var thisObj = this;
+        var li = $(event.target).closest('li');
         $("#myModal").modal('show').on('click', '#delete', function () {
-            li.remove();
-            thisObj.showMessage();
+            li.slideToggle(300, function () {
+                $(this).remove();
+                thisObj.showMessage();
+            });
         }).on('shown.bs.modal', function () {
             $('#delete').focus();
         })
