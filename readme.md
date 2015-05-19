@@ -1,4 +1,4 @@
-# jQuery TODO-LIST
+# jQuery TODO-LIST 
 * **Version**: 1.0
 * http://gregggreggreg.github.io/todo-list/
 

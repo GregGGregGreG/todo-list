@@ -17,6 +17,15 @@
             getDate: getDate,
             switchValueTask: switchValueTask
         };
+        /**
+         *Format text task.
+         * Remove first and last space.
+         * Remove duplicate space.
+         * And replace <br>\n to \n
+         *
+         * @param str
+         * @returns {string}
+         */
         function formatText(str) {
             return str.trim()
                 .replace(removeFirstSpace, '')
@@ -25,6 +34,13 @@
                 .replace(/\n/gm, "<br />\n");
         }
 
+        /**
+         * Create date creating task
+         * in format:
+         * 18 May 2015 | 15:00:59
+         * @param date
+         * @returns {string}
+         */
         function getDate(date) {
             return date.getDate() + ' ' +
                 monthNames[date.getMonth()] + ' ' +
@@ -49,7 +65,7 @@
 
     var defaults = {
         btnAddText: 'Add',
-        messageUserText: 'You Todo - list is empty. Please add task.',
+        messageUserText: 'You Todo - list is empty! Please add task.',
 
         inputId: 'input',
         btnAddId: 'btn-add',
@@ -106,22 +122,25 @@
 
         this.$input = $('<textarea/>', {
             id: this.config.inputId,
-            class: this.config.inputClass
+            class: this.config.inputClass,
+            placeholder: " What do you have in mind this time?",
+            rows: '1'
         }).focus().appendTo(this.$inputGroup);
         //Set aotosize input field
         autosize($('#' + this.config.inputId));
 
-        this.$inputGroupBtn = $('<span/>', {
-            class: this.config.inputGroupBtnClass
-        }).appendTo(this.$inputGroup);
+        //this.$inputGroupBtn = $('<span/>', {
+        //    class: this.config.inputGroupBtnClass
+        //}).appendTo(this.$inputGroup);
 
         this.$btnAdd = $('<button/>', {
             text: this.config.btnAddText,
             id: this.config.btnAddId,
             class: this.config.btnAddClass
-        }).prop('disabled', true).appendTo(this.$inputGroupBtn);
+        }).prop('disabled', true).appendTo(this.$inputGroup);
 
-        this.$messageUser = $('<h2/>', {
+
+        this.$messageUser = $('<h3/>', {
             text: this.config.messageUserText,
             class: this.config.messageUserClass
         }).hide().appendTo(this.element);
@@ -224,17 +243,26 @@
         );
     }
 
+    /**
+     * Add to todo list new task in first place with autosize contain
+     * @param input
+     */
     function addTask(input) {
         var str = ($.type(input) === 'string') ? input : this.$input.val();
         this.createTaskHtml(str).prependTo(this.$todoList);
 
         autosize($('#' + this.config.textAreaEditTaskId));
         this.$input.val('');
-        this.$input.css('height', '54px');
+        this.$input.css('height', '34px');
         this.$btnAdd.prop('disabled', true);
         this.showMessage();
     }
 
+    /**
+     * Set done select task and by adding it to the todo-list end.
+     *
+     * @param str
+     */
     function addDoneTask(str) {
         this.createDoneTaskHtml(str).appendTo(this.$todoList);
         this.$input.focus();
@@ -250,6 +278,10 @@
         autosize($('#' + this.config.textAreaEditTaskId));
     }
 
+    /**
+     * Event for text area set task when editing.
+     * If you hover over the text of the content is copied to the task tekst area and becomes editable
+     */
     function updateKeyUp() {
         var $li = $(event.target).closest('li');
         var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
@@ -270,6 +302,11 @@
         }
     }
 
+    /**
+     * Event for input text field.
+     * Create new task if user click ctr+enter.
+     * @param e
+     */
     function inputKeyUp(e) {
         if (!$(event.target).val().trim()) {
             this.$btnAdd.prop('disabled', true);
@@ -329,15 +366,20 @@
     }
 
     /**
+     * Show modal window.
      * Remove select task  from todo-list.
      * Show message from user if is empty todo-list
      * Destroy task.
      */
     function destroy() {
-        if (confirm('Do you want delete ID_TASK?')) {
-            $(event.target).closest('li').remove();
-            this.showMessage();
-        }
+        var li = $(event.target).closest('li');
+        var thisObj = this;
+        $("#myModal").modal('show').on('click', '#delete', function () {
+            li.remove();
+            thisObj.showMessage();
+        }).on('shown.bs.modal', function () {
+            $('#delete').focus();
+        })
     }
 
     /**
@@ -345,7 +387,7 @@
      */
     function showMessage() {
         this.$input.focus();
-        this.listIsEmpty() ? this.$messageUser.fadeIn(500) : this.$messageUser.hide();
+        this.listIsEmpty() ? this.$messageUser.fadeIn(900) : this.$messageUser.hide();
     }
 
     /**
