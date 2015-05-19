@@ -1,0 +1,86 @@
+body {
+    font-size: 20px;
+}
+li{
+    padding: 0;!important;
+}
+
+#task {
+    overflow: auto;
+}
+
+#task,
+#edit-task {
+    padding: 0;
+    margin-left: 70px;
+    margin-bottom: 13px;
+    margin-top: 1px;
+    width: 80%;
+    font-size: 18px;
+}
+
+#todoList {
+    width: 600px;
+    margin: 20px auto;
+}
+
+#done-list {
+    color: #999999;
+}
+
+#done-list li,
+#done-list #task {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#todo-list, #done-list {
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+#date {
+    position: absolute;
+    bottom: 2px;
+    left: 85px;
+    font-size: 12px;
+    color: #999999;
+    cursor: default;
+    z-index: 1000;
+}
+
+#btn-edit {
+    display: none;
+    position: absolute;
+    top: 5px;
+    left: 35px;
+    border: none;
+}
+
+#btn-remove {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+}
+
+#btn-done {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+#edit-task {
+    display: block;
+    border-radius: 5px;
+    border: none;
+
+    -webkit-transition: height 0.2s;
+    -moz-transition: height 0.2s;
+    transition: height 0.2s;
+
+    resize: none;
+}
