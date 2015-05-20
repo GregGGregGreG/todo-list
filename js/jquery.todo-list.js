@@ -1,12 +1,12 @@
-/**
- * Created by greg on 21.04.15.
- */
 (function ($) {
-    var util = {
-        formatText: function (str) {
-            var removeFirstSpace = /^[ \t]*/gm;
-            var removeDuplicateSpace = /[ \t]{2,}/gm;
-            var removeBlankRows = /^\n{3,}/gm;
+    var enterBtnKeyCode = 13;
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    var removeFirstSpace = /^[ \t]*/gm;
+    var removeDuplicateSpace = /[ \t]{2,}/gm;
+    var removeBlankRows = /^\n{3,}/gm;
+    var util = TodoListUtilService();
 
     function TodoListUtilService() {
         return {
@@ -14,18 +14,30 @@
             getDate: getDate,
             switchValueTask: switchValueTask
         };
+        /**
+         *Format text task.
+         * Remove first and last space.
+         * Remove duplicate space.
+         * And replace <br>\n to \n
+         *
+         * @param str
+         * @returns {string}
+         */
         function formatText(str) {
             return str.trim()
                 .replace(removeFirstSpace, '')
                 .replace(removeDuplicateSpace, ' ')
                 .replace(removeBlankRows, '\n')
                 .replace(/\n/gm, "<br />\n");
-        },
-        getDate: function () {
-            var monthNames = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
+        }
 
+        /**
+         * Create date creating task
+         * in format:
+         * 18 May 2015 | 15:00:59
+         * @param date
+         * @returns {string}
+         */
         function getDate(date) {
             return date.getDate() + ' ' +
                 monthNames[date.getMonth()] + ' ' +
@@ -33,55 +45,46 @@
                 date.toLocaleTimeString();
         }
 
-            return date + ' ' + month + ' ' + ' ' + year + ' | ' + time;
-        },
-        switchValueTask: function (from, to) {
-            var str = from.val() === '' ?
-                from.text() :
-                util.formatText(from.val());
+        function switchValueTask(from, to) {
+            var str = !from.val() ? from.text() : formatText(from.val());
             //Use switch where value task from hover to static task
-            if (from.val() === '') {
-                to.val(str);
-
-                var height = from.height();
-                to.height(height);
+            if (!from.val()) {
+                //to.val(str);
+                to.val(str).height(from.height());
             } else {
                 //Use switch where value task for save edit task
                 to.html(str);
                 //
-                from.val(to.text());
-
-                var height = to.height();
-                from.height(height);
+                from.val(to.text()).height(to.height());
             }
         }
-    };
+    }
 
     var defaults = {
         btnAddText: 'Add',
-        messageUserText: 'You Todo - list is empty. Please add task.',
+        messageUserText: 'You Todo - list is empty! Please add task.',
 
         inputId: 'input',
         btnAddId: 'btn-add',
         todoListId: 'todo-list',
-        doneListId: 'done-list',
         dateAddingTask: 'date',
         taskId: 'task',
         textAreaEditTaskId: 'edit-task',
         btnDoneTaskId: 'btn-done',
         btnRemoveTaskId: 'btn-remove',
         btnSaveEditTaskId: 'btn-edit',
+        messageUserId: 'message-user',
 
         inputClass: 'input',
         btnAddClass: 'btn-add',
         inputGroupClass: 'input-group',
         inputGroupBtnClass: 'input-group-btn',
         todoListClass: 'todo-list',
-        doneListClass: 'done-list',
         liTodoClass: 'li-todo',
         btnDoneTaskClass: 'btn-done',
         btnRemoveTaskClass: 'btn-remove',
-        btnEditTaskClass: 'btn-edit'
+        btnEditTaskClass: 'btn-edit',
+        messageUserClass: 'text-center'
     };
 
     function TodoList(element, options) {
@@ -89,34 +92,52 @@
         this.element = element;
         this.init();
         this.bindEvents();
+        this.showMessage();
     }
 
-    TodoList.prototype.init = function () {
+    TodoList.prototype.init = init;
+    TodoList.prototype.bindEvents = bindEvents;
+    TodoList.prototype.createTaskHtml = createTaskHtml;
+    TodoList.prototype.createDoneTaskHtml = createDoneTaskHtml;
+    TodoList.prototype.addTask = addTask;
+    TodoList.prototype.addDoneTask = addDoneTask;
+    TodoList.prototype.updateKeyUp = updateKeyUp;
+    TodoList.prototype.inputKeyUp = inputKeyUp;
+    TodoList.prototype.toggle = toggle;
+    TodoList.prototype.done = done;
+    TodoList.prototype.cancelTask = cancelTask;
+    TodoList.prototype.update = update;
+    TodoList.prototype.destroy = destroy;
+    TodoList.prototype.showMessage = showMessage;
+    TodoList.prototype.listIsEmpty = listIsEmpty;
 
-        this.$inputGroup = $('<div/>', {
-            class: this.config.inputGroupClass
-        }).appendTo(this.element);
+    /**
+     * Create input group: input and button for adding task, empty task-list.
+     */
+    function init() {
 
-        this.$input = $('<input/>', {
+        this.$inputGroup = $('<div/>', {class: this.config.inputGroupClass}).appendTo(this.element);
+
+        this.$input = $('<textarea/>', {
             id: this.config.inputId,
-            class: this.config.inputClass
+            class: this.config.inputClass,
+            placeholder: " What do you have in mind this time?",
+            rows: '1'
         }).focus().appendTo(this.$inputGroup);
         //Set aotosize input field
         autosize($('#' + this.config.inputId));
-
-        //this.$inputGroupBtn = $('<span/>', {
-        //    class: this.config.inputGroupBtnClass
-        //}).appendTo(this.$inputGroup);
 
         this.$btnAdd = $('<button/>', {
             text: this.config.btnAddText,
             id: this.config.btnAddId,
             class: this.config.btnAddClass
-        }).prop('disabled', true).appendTo(this.$inputGroupBtn);
+        }).prop('disabled', true).appendTo(this.$inputGroup);
 
-        this.$messageUser = $('<h2/>', {
+
+        this.$messageUser = $('<h3/>', {
             text: this.config.messageUserText,
-            class: this.config.messageUserClass
+            class: this.config.messageUserClass,
+            id: this.config.messageUserId,
         }).hide().appendTo(this.element);
 
         this.$todoList = $('<ul/>', {
@@ -124,42 +145,103 @@
             class: this.config.todoListClass
         }).appendTo(this.element);
 
-        this.$doneList = $('<ul/>', {
-            id: this.config.doneListId,
-            class: this.config.doneListClass
-        }).appendTo(this.element);
+        this.$li = function () {
+            return $('<li/>', {
+                class: this.config.liTodoClass
+            });
+        };
 
-    };
+        this.$task = function (str) {
+            return $('<div/>', {id: this.config.taskId}).html(util.formatText(str));
+        };
 
-    TodoList.prototype.bindEvents = function () {
-        var $this = this;
+        this.$textAreaEditTask = function () {
+            return $('<textarea/>', {
+                id: this.config.textAreaEditTaskId,
+                rows: '1'
+            });
+        };
 
-        this.$input.keyup(function (e) {
-            var emptyInput = '';
-            var enterBtnKeyCode = 13;
-            var currentKeyCode = e.keyCode;
+        this.$buttonDone = function () {
+            return $('<input/>', {
+                type: 'checkbox',
+                id: this.config.btnDoneTaskId,
+                class: this.config.btnDoneTaskClass
+            });
+        };
 
-            var str = $this.$input.val().trim();
+        this.$buttonUpdate = function () {
+            return $('<button/>', {
+                id: this.config.btnSaveEditTaskId,
+                class: this.config.btnEditTaskClass
+            }).addClass(this.config.btnEditTaskClass)
+                .append($(document.createElement('span'))
+                    .addClass('glyphicon glyphicon-edit')
+                    .attr('aria-hidden', true));
+        };
 
-            if (str === emptyInput) {
-                $this.$btnAdd.prop('disabled', true);
-            } else if (currentKeyCode === enterBtnKeyCode) {
-                $this.$btnAdd.click();
-                $this.$btnAdd.prop('disabled', true);
-            } else  $this.$btnAdd.prop('disabled', false);
+        this.$buttonDestroy = function () {
+            return $('<span/>', {
+                id: this.config.btnRemoveTaskId,
+                class: this.config.btnRemoveTaskClass
+            });
+        };
 
-        });
+        this.$dateAddingTask = function () {
+            return $('<span/>', {
+                id: this.config.dateAddingTask,
+                text: util.getDate(new Date)
+            });
+        };
+    }
 
-        this.$btnAdd.on('click', this.createTask.bind(this));
+    /**
+     * Events for click buttons: Add task, Destroy task, Update task, Done task and hover for task.
+     */
+    function bindEvents() {
+        this.$btnAdd.on('click', this.addTask.bind(this));
+        this.$input.keyup(this.inputKeyUp.bind(this));
+        this.$todoList.delegate('#' + this.config.textAreaEditTaskId, 'keyup', this.updateKeyUp.bind(this));
+        this.$todoList.delegate('#' + this.config.btnDoneTaskId, 'click', this.done.bind(this));
+        this.$todoList.delegate('#' + this.config.btnSaveEditTaskId, 'click', this.update.bind(this));
+        this.$todoList.delegate('#' + this.config.btnRemoveTaskId, 'click', this.destroy.bind(this));
+        this.$todoList.delegate('li', 'mouseenter mouseleave', this.toggle.bind(this));
+    }
 
-        this.$todoList.delegate('#' + this.config.btnDoneTaskId, 'click', $this.done.bind(this, 0));
-        this.$doneList.delegate('#' + this.config.btnDoneTaskId, 'click', $this.done.bind(this, 1));
+    /**
+     * Create li with task , button done, update ,and destroy.
+     * Adding for date creating.
+     * @param str
+     * @returns  {html element li}
+     */
+    function createTaskHtml(str) {
+        return $(this.$li()).append(
+            $(this.$textAreaEditTask()).hide(),
+            $(this.$task(str)),
+            $(this.$buttonDone()),
+            $(this.$buttonUpdate()),
+            $(this.$buttonDestroy()),
+            $(this.$dateAddingTask())
+        );
+    }
 
-        this.$todoList.delegate('#' + this.config.textAreaEditTaskId, 'keyup', function () {
-            var $li = $(this).closest('li');
-            var $editTask = $li.find('#' + $this.config.textAreaEditTaskId);
-            var $btnSaveEditTask = $li.find('#' + $this.config.btnSaveEditTaskId);
+    /**
+     * Create li with task,button destroy and done.
+     * @param str
+     * @returns {html element li}
+     */
+    function createDoneTaskHtml(str) {
+        return $(this.$li()).css({'color': '#999999'}).append(
+            $(this.$task(str)).css({'text-decoration': 'line-through'}),
+            $(this.$buttonDone()).prop('checked', true),
+            $(this.$buttonDestroy())
+        );
+    }
 
+    /**
+     * Add to todo list new task in first place with autosize contain
+     * @param input
+     */
     function addTask(input) {
         var str = ($.type(input) === 'string') ? input : this.$input.val();
         this.createTaskHtml(str).prependTo(this.$todoList);
@@ -171,32 +253,59 @@
         this.showMessage();
     }
 
+    /**
+     * Set done select task and by adding it to the todo-list end.
+     *
+     * @param str
+     */
     function addDoneTask(str) {
         this.createDoneTaskHtml(str).appendTo(this.$todoList);
         this.$input.focus();
     }
 
-        this.$todoList.delegate('#' + this.config.btnSaveEditTaskId, 'click', function () {
-            var $li = $(this).closest('li');
-            var $editTask = $li.find('#' + $this.config.textAreaEditTaskId);
-            var $task = $li.find('#' + $this.config.taskId);
+    /**
+     * From the text of the task execution creates a new task by adding it to the todo-list of the first tasks
+     * of the new creation date
+     * @param str
+     */
+    function cancelTask(str) {
+        this.createTaskHtml(str).prependTo(this.$todoList);
+        autosize($('#' + this.config.textAreaEditTaskId));
+    }
 
-    function updateKeyUp() {
+    /**
+     * Event for text area set task when editing.
+     * If you hover over the text of the content is copied to the task tekst area and becomes editable
+     */
+    function updateKeyUp(e) {
         var $li = $(event.target).closest('li');
         var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
         var $btnSaveEditTask = $li.find('#' + this.config.btnSaveEditTaskId);
 
-            $li.find('#' + $this.config.btnSaveEditTaskId).prop('disabled', true);
-        });
+        var str = $li.find('#' + this.config.taskId).text();
+        var editStr = $editTask.val().trim();
+        // disabled edit button
+        $btnSaveEditTask.prop('disabled', true);
 
-        this.$todoList.delegate('#' + this.config.btnRemoveTaskId, 'click', $this.destroy.bind(this));
-        this.$doneList.delegate('#' + this.config.btnRemoveTaskId, 'click', $this.destroy.bind(this));
+        if (editStr === '') {
+            $btnSaveEditTask.prop('disabled', true);
+            return;
+        }
 
-        this.$todoList.delegate('li', 'mouseenter mouseleave', function (event) {
-            var $li = $(this).closest('li');
-            var $editTask = $li.find('#' + $this.config.textAreaEditTaskId);
-            var $task = $li.find('#' + $this.config.taskId);
+        if (str != editStr) {
+            $btnSaveEditTask.prop('disabled', false);
+        }
 
+        if(e.ctrlKey && e.keyCode === enterBtnKeyCode){
+            this.update();
+        }
+    }
+
+    /**
+     * Event for input text field.
+     * Create new task if user click ctr+enter.
+     * @param e
+     */
     function inputKeyUp(e) {
         if (!$(event.target).val().trim()) {
             this.$btnAdd.prop('disabled', true);
@@ -206,56 +315,72 @@
         } else this.$btnAdd.prop('disabled', false);
     }
 
-            $editTask.toggle(event.type === 'mouseenter');
-            $task.toggle(event.type === 'mouseleave');
+    function toggle(event) {
+        var eventType = event.type;
+        var $li = $(event.target).closest('li');
+        var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
+        var $task = $li.find('#' + this.config.taskId);
 
-            $li.find('#' + $this.config.btnSaveEditTaskId).prop('disabled', true);
+        if ($li.find('#' + this.config.btnDoneTaskId).is(":checked")) {
+            $li.find('#' + this.config.btnRemoveTaskId).toggle(eventType === 'mouseenter');
+            $li.find('#' + this.config.btnDoneTaskId).toggle(eventType === 'mouseenter');
+        } else {
+            util.switchValueTask($task, $editTask);
 
-            $li.find('#' + $this.config.btnRemoveTaskId).toggle(event.type === 'mouseenter');
-            $li.find('#' + $this.config.btnDoneTaskId).toggle(event.type === 'mouseenter');
-            $li.find('#' + $this.config.btnSaveEditTaskId).toggle(event.type === 'mouseenter');
-        });
-        this.$doneList.delegate('li', 'mouseenter mouseleave', function (event) {
-            var $li = $(this).closest('li');
-            $li.find('#' + $this.config.btnRemoveTaskId).toggle(event.type === 'mouseenter');
-            $li.find('#' + $this.config.btnDoneTaskId).toggle(event.type === 'mouseenter');
-        });
+            $editTask.toggle(eventType === 'mouseenter');
+            $task.toggle(eventType === 'mouseleave');
 
-    };
+            $li.find('#' + this.config.btnSaveEditTaskId).prop('disabled', true);
 
-    TodoList.prototype.createTask = function (str) {
-
-        this.$li = $('<li/>', {
-            class: this.config.liTodoClass
-        });
-
-        this.$textAreaEditTask = $('<textarea/>', {
-            id: this.config.textAreaEditTaskId,
-            rows: '1'
-        }).appendTo(this.$li)
-            .hide();
-
-        this.$task = $('<div/>', {
-            id: this.config.taskId,
-        }).html(util.formatText(this.$input.val() || str))
-            .appendTo(this.$li);
-
-        this.$buttonDone = $('<input/>', {
-            type:'checkbox',
-            id: this.config.btnDoneTaskId,
-            class: this.config.btnDoneTaskClass
-        }).appendTo(this.$li);
+            $li.find('#' + this.config.btnRemoveTaskId).toggle(eventType === 'mouseenter');
+            $li.find('#' + this.config.btnDoneTaskId).toggle(eventType === 'mouseenter');
+            $li.find('#' + this.config.btnSaveEditTaskId).toggle(eventType === 'mouseenter');
+        }
+    }
 
     /**
-     * Remove select task  from todo-list.
+     * The task gets done. It becomes the end of the list. Remove buttons
+     * editing and creation date
+     *
+     * Set task done.
+     */
+    function done() {
+        var str = $(event.target).closest('li').find('#' + this.config.taskId).text();
+        $(event.target).closest('li').remove();
+        $(event.target).is(":checked") ? this.addDoneTask(str) : this.cancelTask(str);
+    }
+
+    /**
+     *
+     * Update text task
+     */
+    function update() {
+        var $li = $(event.target).closest('li');
+        var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
+        var $task = $li.find('#' + this.config.taskId);
+
+        util.switchValueTask($editTask, $task);
+
+        $li.find('#' + this.config.btnSaveEditTaskId).prop('disabled', true);
+    }
+
+    /**
+     * Show modal window.Focus in delete button
+     * Remove select task with slide toogle from todo-list.
      * Show message from user if is empty todo-list
      * Destroy task.
      */
     function destroy() {
-        if (confirm('Do you want delete ID_TASK?')) {
-            $(event.target).closest('li').remove();
-            this.showMessage();
-        }
+        var thisObj = this;
+        var li = $(event.target).closest('li');
+        $("#myModal").modal('show').on('click', '#delete', function () {
+            li.slideToggle(300, function () {
+                $(this).remove();
+                thisObj.showMessage();
+            });
+        }).on('shown.bs.modal', function () {
+            $('#delete').focus();
+        })
     }
 
     /**
@@ -263,63 +388,20 @@
      */
     function showMessage() {
         this.$input.focus();
-        this.listIsEmpty() ? this.$messageUser.fadeIn(500) : this.$messageUser.hide();
+        this.listIsEmpty() ? this.$messageUser.fadeIn(900) : this.$messageUser.hide();
     }
 
-        this.dateAddingTask = $('<span/>', {
-            id: this.config.dateAddingTask,
-            text: util.getDate()
-        }).appendTo(this.$li);
-
-        this.$todoList.prepend(this.$li);
-        autosize($('#' + this.config.textAreaEditTaskId));
-        this.$input.val('');
-    };
-
-    TodoList.prototype.createDoneTask = function (str) {
-
-        this.$li = $('<li/>', {
-            class: this.config.liTodoClass
-        }).appendTo(this.$doneList);
-
-        this.$task = $('<div/>', {
-            id: this.config.taskId
-        }).css({
-            'text-decoration': 'line-through'
-        }).html(util.formatText(str))
-            .appendTo(this.$li);
-
-        this.$buttonDone = $('<input/>', {
-            type:'checkbox',
-            id: this.config.btnDoneTaskId,
-            class: this.config.btnDoneTaskClass
-        }).appendTo(this.$li);
-
-        this.$buttonRemove = $('<span/>', {
-            id: this.config.btnRemoveTaskId,
-            class: this.config.btnRemoveTaskClass
-        }).appendTo(this.$li);
-
-        this.$input.val('');
-    };
-
-    TodoList.prototype.done = function (list) {
-        var $li = $(event.target).closest('li');
-        var str = $li.find('#' + this.config.taskId).text();
-        list === 1 ? this.createTask(str) : this.createDoneTask(str);
-        $li.remove();
-    };
-
-    TodoList.prototype.destroy = function () {
-        if (confirm('Do you want delete ID_TASK?')) {
-            $(event.target).closest('li').slideToggle(300, function () {
-                $(this).remove();
-            });
-        }
-    };
+    /**
+     * Return true if todo-list is empty.If list doesn't empty return false.
+     * @returns {boolean}
+     */
+    function listIsEmpty() {
+        return this.$todoList.children().length === 0;
+    }
 
     $.fn.todoList = function (optioons) {
-        new TodoList(this.first(), optioons);
-        return this.first();
+        var element = this.first();
+        new TodoList(element, optioons);
+        return element;
     }
 }(jQuery));

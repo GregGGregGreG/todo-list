@@ -1,8 +1,8 @@
-body {
-    font-size: 20px;
-    /*font:normal normal normal 16px/1 octicons;*/
-    font:13px/1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
-
+html {
+    /*font-size: 20px;*/
+    /*/!*font:normal normal normal 16px/1 octicons;*!/*/
+    /*font:13px/1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";*/
+    /*font-family: "Whitney SSm A", "Whitney SSm B", "Lucida Grande", "Lucida Sans", Verdana, Helvetica, Arial, sans-serif;!important;*/
 }
 li{
     padding: 0;!important;
@@ -10,6 +10,7 @@ li{
 
 #task {
     overflow: auto;
+    word-wrap: break-word;
 }
 
 
@@ -108,4 +109,7 @@ li{
     transition: height 0.2s;
 
     resize: none;
+}
+#message-user{
+    color:#42444e;
 }
