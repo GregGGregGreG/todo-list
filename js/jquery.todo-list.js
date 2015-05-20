@@ -391,7 +391,7 @@
      */
     function showMessage() {
         this.$input.focus();
-        this.listIsEmpty() ? this.$messageUser.fadeIn(900) : this.$messageUser.hide();
+        this.listIsEmpty() ? this.$messageUser.slideToggle(600) : this.$messageUser.hide();
     }
 
     /**

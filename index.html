@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-<head lang="en">
-    <meta charset="UTF-8">
+<head>
+    <!--<meta charset="UTF-8">-->
     <title>TODO-LIST</title>
     <link href="css/app.css" rel="stylesheet">
     <script src="node_modules/jquery/dist/jquery.js"></script>
@@ -12,8 +12,27 @@
     <script src="js/main.js"></script>
 </head>
 <body>
-<div id="todoList"></div>
-<div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<header class="primary-header">
+    <div class="container">
+        <h1 class="primary-header__title">
+            My Tasks App
+            <small>using JQuery and Bootstrap</small>
+        </h1>
+    </div>
+</header>
+<main>
+    <div class="container">
+        <div id="todoList"></div>
+    </div>
+</main>
+<footer class="primary-footer">
+    <div class="container">
+        <div class="input-line"></div>
+        <small>&copy; 2015 Todo-List<br> Demo by <a href="https://github.com/GregGGregGreG">TrueGreG</a></small>
+    </div>
+</footer>
+<div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-body">
@@ -21,11 +40,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal" id="delete" >Delete</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="delete">Delete</button>
             </div>
         </div>
     </div>
 </div>
-
 </body>
 </html>
