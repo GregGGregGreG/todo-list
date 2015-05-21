@@ -14,3 +14,7 @@ $(function () {
         messageUserClass: ' text-center'
     });
 });
+
+$(function () {
+    $.template();
+});
