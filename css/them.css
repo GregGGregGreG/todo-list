@@ -1,0 +1,129 @@
+#todo-list {
+    width: 600px;
+    margin: 20px auto;
+    padding: 0;
+}
+
+#task-list {
+    width: 600px;
+    margin: 20px auto;
+    padding: 0;
+}
+
+.input-group {
+    width: 100%;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+    padding: 12px;
+    background: #f5f5f5;
+}
+
+.input-line {
+    background: url('../images/input-line.png') no-repeat 50% 0;
+    padding-bottom: 10px;
+    width: 600px;
+    margin: 10px auto;
+}
+
+#task {
+    overflow: auto;
+    word-wrap: break-word;
+    display: inline-block;
+}
+#task.task-done{
+    margin-bottom: 0;
+    text-decoration: line-through;
+}
+#edit-task {
+    display: none;
+    border-radius: 5px;
+    border: none;
+
+    -webkit-transition: height 0.2s;
+    -moz-transition: height 0.2s;
+    transition: height 0.2s;
+
+    resize: none;
+}
+
+
+#task,
+#edit-task {
+    padding: 0;
+    margin-left: 70px;
+    margin-bottom: 13px;
+    margin-top: 1px;
+    width: 80%;
+}
+
+#date {
+    position: absolute;
+    bottom: 2px;
+    left: 85px;
+    font-size: 12px;
+    color: #898989;
+    cursor: default;
+    z-index: 1000;
+}
+
+#input {
+    margin-bottom: 10px;
+}
+
+#btn-add {
+    width: 15%;
+}
+
+#btn-add, #btn-done, #btn-edit, #btn-remove {
+    cursor: pointer;
+}
+
+#btn-edit {
+    display: none;
+    position: absolute;
+    top: 5px;
+    left: 35px;
+    border: none;
+}
+
+#btn-remove {
+    padding: 0;
+    margin: 0;
+    width: 18px;
+    height: 17px;
+    border-radius:20px;
+    border: none;
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+}
+
+.glyphicon.glyphicon-remove{
+    color: #777;
+
+}
+.glyphicon.glyphicon-remove:hover{
+    color: #322a2e;
+}
+
+#btn-done {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+#message-user {
+    color: #42444e;
+}
+
+.glyphicon {
+    font-size: 20px;
+}
+/*.glyphicon:hover {*/
+    /*color: #d51a19;*/
+/*}*/
+/*.glyphicon.spaced {*/
+    /*letter-spacing:6px;*/
+/*}*/
