@@ -27,11 +27,12 @@
          * @returns {string}
          */
         function formatText(str) {
-            return str.trim()
+            return str
                 .replace(removeFirstSpace, '')
                 .replace(removeDuplicateSpace, ' ')
                 .replace(removeBlankRows, '\n')
-                .replace(/\n/gm, "<br />\n");
+                .replace(/\n/gm, "<br />\n")
+                .trim();
         }
 
         /**
@@ -64,14 +65,9 @@
     }
 
     var defaults = {
-        btnAddText: 'Add',
-        messageUserText: 'You Todo - list is empty! Please add task.',
-
-        inputPlaceholder: 'What do you have in mind this time?',
-
         inputId: 'input',
         btnAddId: 'btn-add',
-        todoListId: 'todo-list',
+        todoListId: 'task-list',
         dateAddingTaskId: 'date',
         taskId: 'task',
         textAreaEditTaskId: 'edit-task',
@@ -79,17 +75,29 @@
         btnRemoveTaskId: 'btn-remove',
         btnSaveEditTaskId: 'btn-edit',
         messageUserId: 'message-user',
+        modalWindowDestroyTaskId: '',
+        modalWindowDestroyButtonDestroyId: '',
 
-        inputClass: 'input',
-        btnAddClass: 'btn-add',
-        inputGroupClass: 'input-group',
-        inputGroupBtnClass: 'input-group-btn',
-        todoListClass: 'todo-list',
-        liTodoClass: 'li-todo',
-        btnDoneTaskClass: 'btn-done',
-        btnRemoveTaskClass: 'btn-remove',
-        btnEditTaskClass: 'btn-edit',
-        messageUserClass: 'text-center'
+        inputGroupTemplate: "<div >" +
+        "<textarea id='${inputId}'></textarea>" +
+        "<button id='${btnAddId}'>Add</button></div>" +
+        "<h3 id='${messageUserId}'>You Todo - list is empty! Please add task.</h3>" +
+        "<ul id='${todoListId}'></ul>",
+
+        taskTemplate: "<li>" +
+        "<div id='${taskId}'>{{html str}}</div>" +
+        "<textarea id='${textAreaEditTaskId}' ></textarea>" +
+        "<input id='${btnDoneTaskId}'  type='checkbox'/>" +
+        "<button id='${btnSaveEditTaskId}'>" + "<span class='glyphicon glyphicon-edit'></span>" + "</button>" +
+        "<button id='${btnRemoveTaskId}' >Remove</button>" +
+        "<span id='${dateAddingTaskId}'>${date}</span>" +
+        "</li>",
+
+        taskDoneTemplate: "<li class='${liTodoClass}'>" +
+        "<div id='${taskId}' >{{html str}}</div>" +
+        "<input id='${btnDoneTaskId}' type='checkbox' checked/>" +
+        "<span id='${btnRemoveTaskId}'></sp>" +
+        "</li>"
     };
 
     function TodoList(element, options) {
@@ -120,107 +128,16 @@
      * Create input group: input and button for adding task, empty task-list.
      */
     function init() {
-        var inputGroupHtml = "<div class='${inputGroupClass}'>" +
-            "<textarea id='${inputId}' class='${inputClass}' placeholder='${inputPlaceholder}' rows='1'></textarea>" +
-            "<button id='${btnAddId}' class='${btnAddClass}' disabled>${btnAddText}</button></div>" +
-            "<h3 id='${messageUserId}' class='${messageUserClass}'>${messageUserText}</h3>" +
-            "<ul id='${todoListId}' class='${todoListClass}'></ul>";
+        $.template("inputTemplate", this.config.inputGroupTemplate);
+        $.tmpl("inputTemplate", this.config).appendTo(this.element);
 
-        this.taskTemplate = "<li class='${liTodoClass}'>" +
-            "<div id='${taskId}'></div>" +
-            "<textarea id='${textAreaEditTaskId}' rows='1'>${str}</textarea>" +
-            "<button id='${btnDoneTaskId}' class='${btnDoneTaskClass}'></button>" +
-            "<button id='${btnSaveEditTaskId}' class='${btnEditTaskClass}'></button>" +
-            "<button id='${btnRemoveTaskId}' class='${btnRemoveTaskClass}'>" + "<span class='glyphicon glyphicon-edit'></span>" + "</button>" +
-            "<span id='${dateAddingTaskId}'>${date}</span>" +
-            "</li>";
-
-        this.taskDoneTempalte ="<li class='${liTodoClass}'>" +
-            "<div id='${taskId}' style='text-decoration: line-through'>${str}</div>"+
-            "<button id='${btnDoneTaskId}' class='${btnDoneTaskClass}'></button>" +
-            "<button id='${btnRemoveTaskId}' class='${btnRemoveTaskClass}'>" + "<span class='glyphicon glyphicon-edit'></span>" + "</button>" +
-            "</li>";
-
-        $.template("inputTEmplate", inputGroupHtml);
-        $.tmpl("inputTEmplate", this.config).appendTo(this.element);
-
-
-        this.$inputGroup = $('<div/>', {class: this.config.inputGroupClass}).appendTo(this.element);
-
-        this.$input = $('<textarea/>', {
-            id: this.config.inputId,
-            class: this.config.inputClass,
-            placeholder: " What do you have in mind this time?",
-            rows: '1'
-        }).focus().appendTo(this.$inputGroup);
+        this.$input = $('#' + this.config.inputId).focus();
         //Set aotosize input field
         autosize($('#' + this.config.inputId));
 
-        this.$btnAdd = $('<button/>', {
-            text: this.config.btnAddText,
-            id: this.config.btnAddId,
-            class: this.config.btnAddClass
-        }).prop('disabled', true).appendTo(this.$inputGroup);
-
-        this.$messageUser = $('<h3/>', {
-            text: this.config.messageUserText,
-            class: this.config.messageUserClass,
-            id: this.config.messageUserId,
-        }).hide().appendTo(this.element);
-
-        this.$todoList = $('<ul/>', {
-            id: this.config.todoListId,
-            class: this.config.todoListClass
-        }).appendTo(this.element);
-
-        this.$li = function () {
-            return $('<li/>', {
-                class: this.config.liTodoClass
-            });
-        };
-
-        this.$task = function (str) {
-            return $('<div/>', {id: this.config.taskId}).html(util.formatText(str));
-        };
-
-        this.$textAreaEditTask = function () {
-            return $('<textarea/>', {
-                id: this.config.textAreaEditTaskId,
-                rows: '1'
-            });
-        };
-
-        this.$buttonDone = function () {
-            return $('<input/>', {
-                type: 'checkbox',
-                id: this.config.btnDoneTaskId,
-                class: this.config.btnDoneTaskClass
-            });
-        };
-
-        this.$buttonUpdate = function () {
-            return $('<button/>', {
-                id: this.config.btnSaveEditTaskId,
-                class: this.config.btnEditTaskClass
-            }).addClass(this.config.btnEditTaskClass)
-                .append($(document.createElement('span'))
-                    .addClass('glyphicon glyphicon-edit')
-                    .attr('aria-hidden', true));
-        };
-
-        this.$buttonDestroy = function () {
-            return $('<span/>', {
-                id: this.config.btnRemoveTaskId,
-                class: this.config.btnRemoveTaskClass
-            });
-        };
-
-        this.$dateAddingTask = function () {
-            return $('<span/>', {
-                id: this.config.dateAddingTaskId,
-                text: util.getDate(new Date)
-            });
-        };
+        this.$btnAdd = $('#' + this.config.btnAddId).prop('disabled', true);
+        this.$messageUser = $('#' + this.config.messageUserId).hide();
+        this.$todoList = $('#' + this.config.todoListId);
     }
 
     /**
@@ -228,14 +145,13 @@
      */
     function bindEvents() {
         this.$btnAdd.on('click', this.addTask.bind(this));
-        $('#' + this.config.btnAddId).on('click', this.addTask.bind(this));
         this.$input.keyup(this.inputKeyUp.bind(this));
-        $('#' + this.config.inputId).keyup(this.inputKeyUp.bind(this));
-        this.$todoList.delegate('#' + this.config.textAreaEditTaskId, 'keyup', this.updateKeyUp.bind(this));
-        this.$todoList.delegate('#' + this.config.btnDoneTaskId, 'click', this.done.bind(this));
-        this.$todoList.delegate('#' + this.config.btnSaveEditTaskId, 'click', this.update.bind(this));
-        this.$todoList.delegate('#' + this.config.btnRemoveTaskId, 'click', this.destroy.bind(this));
-        this.$todoList.delegate('li', 'mouseenter mouseleave', this.toggle.bind(this));
+        this.$todoList
+            .delegate('#' + this.config.textAreaEditTaskId, 'keyup', this.updateKeyUp.bind(this))
+            .delegate('#' + this.config.btnDoneTaskId, 'click', this.done.bind(this))
+            .delegate('#' + this.config.btnSaveEditTaskId, 'click', this.update.bind(this))
+            .delegate('#' + this.config.btnRemoveTaskId, 'click', this.destroy.bind(this))
+            .delegate('li', 'mouseenter mouseleave', this.toggle.bind(this));
     }
 
     /**
@@ -245,14 +161,10 @@
      * @returns  {html element li}
      */
     function createTaskHtml(str) {
-        return $(this.$li()).append(
-            $(this.$textAreaEditTask()).hide(),
-            $(this.$task(str)),
-            $(this.$buttonDone()),
-            $(this.$buttonUpdate()),
-            $(this.$buttonDestroy()),
-            $(this.$dateAddingTask())
-        );
+        this.config.str = util.formatText(str);
+        this.config.date = util.getDate(new Date);
+        $.template("taskTemplate", this.config.taskTemplate);
+        return $.tmpl("taskTemplate", this.config);
     }
 
     /**
@@ -261,11 +173,9 @@
      * @returns {html element li}
      */
     function createDoneTaskHtml(str) {
-        return $(this.$li()).css({'color': '#999999'}).append(
-            $(this.$task(str)).css({'text-decoration': 'line-through'}),
-            $(this.$buttonDone()).prop('checked', true),
-            $(this.$buttonDestroy())
-        );
+        this.config.str = util.formatText(str);
+        $.template("taskDoneTemplate", this.config.taskDoneTemplate);
+        return $.tmpl("taskDoneTemplate", this.config);
     }
 
     /**
@@ -281,14 +191,6 @@
         this.$input.css('height', '34px');
         this.$btnAdd.prop('disabled', true);
         this.showMessage();
-        //tempalte
-        var str = ($.type(input) === 'string') ? input : $('#' + this.config.inputId).val();
-        this.config.str = str;
-        this.config.date = util.getDate(new Date);
-        $.template("taskTemplate", this.taskTemplate);
-        $.tmpl("taskTemplate", this.config).prependTo($('#' + this.config.todoListId));
-        $('#' + this.config.inputId).val('');
-        $('#' + this.config.btnAddId).prop('disabled', true);
     }
 
     /**
@@ -297,10 +199,6 @@
      * @param str
      */
     function addDoneTask(str) {
-        this.config.str = str;
-        $.template("taskDoneTemplate", this.taskDoneTempalte);
-        $.tmpl("taskDoneTemplate", this.config).appendTo($('#' + this.config.todoListId));
-
         this.createDoneTaskHtml(str).appendTo(this.$todoList);
         this.$input.focus();
     }
@@ -351,21 +249,12 @@
     function inputKeyUp(e) {
         if (!$(event.target).val().trim()) {
             this.$btnAdd.prop('disabled', true);
-            //template
-            $('#' + this.config.btnAddId).prop('disabled', true);
-
         } else if (e.ctrlKey && e.keyCode === enterBtnKeyCode) {
             this.addTask($(event.target).val());
             this.$btnAdd.prop('disabled', true);
-            //template
-            $('#' + this.config.btnAddId).prop('disabled', true);
-
         } else {
             this.$btnAdd.prop('disabled', false);
-            //template
-            $('#' + this.config.btnAddId).prop('disabled', false);
         }
-        ;
     }
 
     function toggle(event) {
@@ -426,7 +315,8 @@
     function destroy() {
         var thisObj = this;
         var li = $(event.target).closest('li');
-        $("#myModal").modal('show').on('click', '#delete', function () {
+        $('#' + this.config.modalWindowDestroyTaskId).modal('show').on('click',
+            '#' + this.config.modalWindowDestroyButtonDestroyId, function () {
             li.slideToggle(300, function () {
                 $(this).remove();
                 thisObj.showMessage();
@@ -441,7 +331,7 @@
      */
     function showMessage() {
         this.$input.focus();
-        this.listIsEmpty() ? this.$messageUser.slideToggle(600) : this.$messageUser.hide();
+        this.listIsEmpty() ? this.$messageUser.slideDown(600) : this.$messageUser.hide();
     }
 
     /**

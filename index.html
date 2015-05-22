@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>TODO-LIST</title>
     <link href="css/app.css" rel="stylesheet">
+    <link href="css/them.css" rel="stylesheet">
     <script src="node_modules/jquery/dist/jquery.js"></script>
     <link href="node_modules/bootstrap-3.3.4-dist/css/bootstrap.css" rel="stylesheet">
     <script src="node_modules/bootstrap-3.3.4-dist/js/bootstrap.js"></script>
@@ -15,15 +16,15 @@
 <body>
 <header class="primary-header">
     <div class="container">
-        <h1 class="primary-header__title">
+        <div class="primary-header__title">
             My Tasks App
             <small>using JQuery and Bootstrap</small>
-        </h1>
+        </div>
     </div>
 </header>
 <main>
     <div class="container">
-        <div id="todoList"></div>
+        <div id="todo-list"></div>
     </div>
 </main>
 <footer class="primary-footer">
@@ -32,7 +33,7 @@
         <small>&copy; 2015 Todo-List<br> Demo by <a href="https://github.com/GregGGregGreG">TrueGreG</a></small>
     </div>
 </footer>
-<div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<div class="modal fade bs-example-modal-sm" id="destroyTaskModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
      aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -46,5 +47,31 @@
         </div>
     </div>
 </div>
+<script id="inputGroupTemplate" type="text/x-jquery-tmpl">
+    <div class='form-group input-group'>
+        <textarea id='${inputId}' class='form-control' placeholder='What do you have in mind this time?'rows='1'/></textarea>
+        <button id='${btnAddId}' class='btn btn-success btn-sm active'>Add</button>
+    </div>
+    <h3 id='${messageUserId}' class='text-center'>You Todo - list is empty! Please add task.</h3>
+    <ul id='${todoListId}' class='${todoListClass}'></ul>
+</script>
+<script id="taskTemplate" type="text/x-jquery-tmpl">
+    <li class='col-md-12 list-group-item'>
+        <div id='${taskId}'>{{html str}}</div>
+        <textarea id='${textAreaEditTaskId}' rows='1'></textarea>
+        <input id='${btnDoneTaskId}' type='checkbox'/>
+        <button id='${btnSaveEditTaskId}' class='btn btn-default'><span class='glyphicon glyphicon-edit'></span>
+        </button>
+         <span id='${btnRemoveTaskId}' class='glyphicon glyphicon-remove'></span>
+        <span id='${dateAddingTaskId}'>${date}</span>
+    </li>
+</script>
+<script id="taskDoneTemplate" type="text/x-jquery-tmpl">
+    <li class='col-md-12 list-group-item' style='color: #999999'>
+        <div id='${taskId}' class='task-done'>{{html str}}</div>
+        <input id='${btnDoneTaskId}'  type='checkbox' checked/>
+        <span id='${btnRemoveTaskId}' class='glyphicon glyphicon-remove'></span>
+    </li>
+</script>
 </body>
 </html>
