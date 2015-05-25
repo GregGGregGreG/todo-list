@@ -74,11 +74,11 @@
     width: 15%;
 }
 
-#btn-add, #btn-done, #btn-edit, #btn-remove {
+#btn-add, #btn-done, #btn-update, #btn-remove {
     cursor: pointer;
 }
 
-#btn-edit {
+#btn-update {
     display: none;
     position: absolute;
     top: 5px;

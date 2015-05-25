@@ -25,11 +25,11 @@
          */
         function formatText(str) {
             return str
+                .trim()
                 .replace(removeFirstSpace, '')
                 .replace(removeDuplicateSpace, ' ')
                 .replace(removeBlankRows, '\n')
-                .replace(/\n/gm, "<br />\n")
-                .trim();
+                .replace(/\n/gm, "<br />\n");
         }
 
         /**
@@ -70,7 +70,7 @@
         textAreaEditTaskId: 'edit-task',
         btnDoneTaskId: 'btn-done',
         btnRemoveTaskId: 'btn-remove',
-        btnSaveEditTaskId: 'btn-edit',
+        btnUpdateTaskId: 'btn-update',
         messageUserId: 'message-user',
         modalWindowDestroyTaskId: '',
         modalWindowDestroyButtonDestroyId: '',
@@ -85,7 +85,7 @@
         "<div id='${taskId}'>{{html str}}</div>" +
         "<textarea id='${textAreaEditTaskId}' ></textarea>" +
         "<input id='${btnDoneTaskId}'  type='checkbox'/>" +
-        "<button id='${btnSaveEditTaskId}'>" + "<span class='glyphicon glyphicon-edit'></span>" + "</button>" +
+        "<button id='${btnUpdateTaskId}'>" + "<span class='glyphicon glyphicon-edit'></span>" + "</button>" +
         "<button id='${btnRemoveTaskId}' >Remove</button>" +
         "<span id='${dateAddingTaskId}'>${date}</span>" +
         "</li>",
@@ -120,6 +120,7 @@
     TodoList.prototype.destroy = destroy;
     TodoList.prototype.showMessage = showMessage;
     TodoList.prototype.listIsEmpty = listIsEmpty;
+    TodoList.prototype.getCurrentStateTask = getCurrentStateTask;
 
     /**
      * Create input group: input and button for adding task, empty task-list.
@@ -146,7 +147,7 @@
         this.$todoList
             .delegate('#' + this.config.textAreaEditTaskId, 'keyup', this.updateKeyUp.bind(this))
             .delegate('#' + this.config.btnDoneTaskId, 'click', this.done.bind(this))
-            .delegate('#' + this.config.btnSaveEditTaskId, 'click', this.update.bind(this))
+            .delegate('#' + this.config.btnUpdateTaskId, 'click', this.update.bind(this))
             .delegate('#' + this.config.btnRemoveTaskId, 'click', this.destroy.bind(this))
             .delegate('li', 'mouseenter mouseleave', this.toggle.bind(this));
     }
@@ -217,20 +218,20 @@
     function updateKeyUp(e) {
         var $li = $(event.target).closest('li');
         var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
-        var $btnSaveEditTask = $li.find('#' + this.config.btnSaveEditTaskId);
+        var $btnUpdateTask = $li.find('#' + this.config.btnUpdateTaskId);
 
         var str = $li.find('#' + this.config.taskId).text();
         var editStr = $editTask.val().trim();
         // disabled edit button
-        $btnSaveEditTask.prop('disabled', true);
+        $btnUpdateTask.prop('disabled', true);
 
         if (editStr === '') {
-            $btnSaveEditTask.prop('disabled', true);
+            $btnUpdateTask.prop('disabled', true);
             return;
         }
 
         if (str != editStr) {
-            $btnSaveEditTask.prop('disabled', false);
+            $btnUpdateTask.prop('disabled', false);
         }
 
         if (e.ctrlKey && e.keyCode === enterBtnKeyCode) {
@@ -269,11 +270,11 @@
             $editTask.toggle(eventType === 'mouseenter');
             $task.toggle(eventType === 'mouseleave');
 
-            $li.find('#' + this.config.btnSaveEditTaskId).prop('disabled', true);
+            $li.find('#' + this.config.btnUpdateTaskId).prop('disabled', true);
 
             $li.find('#' + this.config.btnRemoveTaskId).toggle(eventType === 'mouseenter');
             $li.find('#' + this.config.btnDoneTaskId).toggle(eventType === 'mouseenter');
-            $li.find('#' + this.config.btnSaveEditTaskId).toggle(eventType === 'mouseenter');
+            $li.find('#' + this.config.btnUpdateTaskId).toggle(eventType === 'mouseenter');
         }
     }
 
@@ -294,13 +295,9 @@
      * Update text task
      */
     function update() {
-        var $li = $(event.target).closest('li');
-        var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
-        var $task = $li.find('#' + this.config.taskId);
-
-        util.switchValueTask($editTask, $task);
-
-        $li.find('#' + this.config.btnSaveEditTaskId).prop('disabled', true);
+        var state = this.getCurrentStateTask(this);
+        util.switchValueTask(state.$editTask, state.$task);
+        state.$btnUpdate.prop('disabled', true);
     }
 
     /**
@@ -314,13 +311,25 @@
         var li = $(event.target).closest('li');
         $('#' + this.config.modalWindowDestroyTaskId).modal('show').on('click',
             '#' + this.config.modalWindowDestroyButtonDestroyId, function () {
-            li.slideToggle(300, function () {
-                $(this).remove();
-                thisObj.showMessage();
-            });
-        }).on('shown.bs.modal', function () {
-            $('#delete').focus();
-        })
+                li.slideToggle(300, function () {
+                    $(this).remove();
+                    thisObj.showMessage();
+                });
+            }).on('shown.bs.modal', function () {
+                $('#delete').focus();
+            })
+    }
+
+    /**
+     * Get current state task.
+     * Find current task,edit task,btn update,remove,done.
+     */
+    function getCurrentStateTask() {
+        return {
+            $task: $(event.target).closest('li').find('#' + this.config.taskId),
+            $editTask: $(event.target).closest('li').find('#' + this.config.textAreaEditTaskId),
+            $btnUpdate: $(event.target).closest('li').find('#' + this.config.btnUpdateTaskId)
+        };
     }
 
     /**
