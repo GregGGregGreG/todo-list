@@ -114,8 +114,8 @@
     TodoList.prototype.updateKeyUp = updateKeyUp;
     TodoList.prototype.inputKeyUp = inputKeyUp;
     TodoList.prototype.toggle = toggle;
-    TodoList.prototype.done = done;
     TodoList.prototype.cancelTask = cancelTask;
+    TodoList.prototype.done = done;
     TodoList.prototype.update = update;
     TodoList.prototype.destroy = destroy;
     TodoList.prototype.showMessage = showMessage;
@@ -216,22 +216,21 @@
      * If you hover over the text of the content is copied to the task tekst area and becomes editable
      */
     function updateKeyUp(e) {
-        var $li = $(event.target).closest('li');
-        var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
-        var $btnUpdateTask = $li.find('#' + this.config.btnUpdateTaskId);
+        var state = this.getCurrentStateTask();
 
-        var str = $li.find('#' + this.config.taskId).text();
-        var editStr = $editTask.val().trim();
+        var str = state.$task.text();
+        var editStr = state.$editTask.val().trim();
         // disabled edit button
-        $btnUpdateTask.prop('disabled', true);
+        state.$btnUpdateTask.prop('disabled', true);
 
         if (editStr === '') {
-            $btnUpdateTask.prop('disabled', true);
+            state.$btnUpdateTask.prop('disabled', true);
             return;
         }
 
         if (str != editStr) {
-            $btnUpdateTask.prop('disabled', false);
+            state.$btnUpdateTask.prop('disabled', false);
+
         }
 
         if (e.ctrlKey && e.keyCode === enterBtnKeyCode) {
@@ -256,25 +255,23 @@
     }
 
     function toggle(event) {
+        var state = this.getCurrentStateTask();
         var eventType = event.type;
-        var $li = $(event.target).closest('li');
-        var $editTask = $li.find('#' + this.config.textAreaEditTaskId);
-        var $task = $li.find('#' + this.config.taskId);
 
-        if ($li.find('#' + this.config.btnDoneTaskId).is(":checked")) {
-            $li.find('#' + this.config.btnRemoveTaskId).toggle(eventType === 'mouseenter');
-            $li.find('#' + this.config.btnDoneTaskId).toggle(eventType === 'mouseenter');
+        if (state.$btnDoneTask.is(":checked")) {
+            state.$btnRemoveTask.toggle(eventType === 'mouseenter');
+            state.$btnDoneTask.toggle(eventType === 'mouseenter');
         } else {
-            util.switchValueTask($task, $editTask);
+            util.switchValueTask(state.$task, state.$editTask);
 
-            $editTask.toggle(eventType === 'mouseenter');
-            $task.toggle(eventType === 'mouseleave');
+            state.$editTask.toggle(eventType === 'mouseenter');
+            state.$task.toggle(eventType === 'mouseleave');
 
-            $li.find('#' + this.config.btnUpdateTaskId).prop('disabled', true);
+            state.$btnUpdateTask.prop('disabled', true);
 
-            $li.find('#' + this.config.btnRemoveTaskId).toggle(eventType === 'mouseenter');
-            $li.find('#' + this.config.btnDoneTaskId).toggle(eventType === 'mouseenter');
-            $li.find('#' + this.config.btnUpdateTaskId).toggle(eventType === 'mouseenter');
+            state.$btnRemoveTask.toggle(eventType === 'mouseenter');
+            state.$btnDoneTask.toggle(eventType === 'mouseenter');
+            state.$btnUpdateTask.toggle(eventType === 'mouseenter');
         }
     }
 
@@ -285,9 +282,10 @@
      * Set task done.
      */
     function done() {
-        var str = $(event.target).closest('li').find('#' + this.config.taskId).text();
-        $(event.target).closest('li').remove();
-        $(event.target).is(":checked") ? this.addDoneTask(str) : this.cancelTask(str);
+        var state = this.getCurrentStateTask();
+        var str = state.$task.text();
+        state.$li.remove();
+        state.$btnDoneTask.is(":checked") ? this.addDoneTask(str) : this.cancelTask(str);
     }
 
     /**
@@ -295,9 +293,9 @@
      * Update text task
      */
     function update() {
-        var state = this.getCurrentStateTask(this);
+        var state = this.getCurrentStateTask();
         util.switchValueTask(state.$editTask, state.$task);
-        state.$btnUpdate.prop('disabled', true);
+        state.$btnUpdateTask.prop('disabled', true);
     }
 
     /**
@@ -326,9 +324,12 @@
      */
     function getCurrentStateTask() {
         return {
+            $li: $(event.target).closest('li'),
             $task: $(event.target).closest('li').find('#' + this.config.taskId),
             $editTask: $(event.target).closest('li').find('#' + this.config.textAreaEditTaskId),
-            $btnUpdate: $(event.target).closest('li').find('#' + this.config.btnUpdateTaskId)
+            $btnUpdateTask: $(event.target).closest('li').find('#' + this.config.btnUpdateTaskId),
+            $btnDoneTask: $(event.target).closest('li').find('#' + this.config.btnDoneTaskId),
+            $btnRemoveTask: $(event.target).closest('li').find('#' + this.config.btnRemoveTaskId)
         };
     }
 
