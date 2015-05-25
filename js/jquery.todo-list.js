@@ -1,6 +1,8 @@
 (function ($) {
+    var oneRowHeightTextArea = 34;
     var enterBtnKeyCode = 13;
-    var monthNames = ["January", "February", "March", "April", "May", "June",
+    var monthNames = [
+        "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
     var removeFirstSpace = /^[ \t]*/gm;
@@ -110,11 +112,11 @@
     TodoList.prototype.createTaskHtml = createTaskHtml;
     TodoList.prototype.createDoneTaskHtml = createDoneTaskHtml;
     TodoList.prototype.addTask = addTask;
+    TodoList.prototype.cancelTask = cancelTask;
     TodoList.prototype.addDoneTask = addDoneTask;
     TodoList.prototype.updateKeyUp = updateKeyUp;
     TodoList.prototype.inputKeyUp = inputKeyUp;
     TodoList.prototype.toggle = toggle;
-    TodoList.prototype.cancelTask = cancelTask;
     TodoList.prototype.done = done;
     TodoList.prototype.update = update;
     TodoList.prototype.destroy = destroy;
@@ -128,7 +130,7 @@
     function init() {
         $.template("inputTemplate", this.config.inputGroupTemplate);
         $.tmpl("inputTemplate", this.config).appendTo(this.element);
-
+        //Set focus input
         this.$input = $('#' + this.config.inputId).focus();
         //Set aotosize input field
         autosize($('#' + this.config.inputId));
@@ -186,7 +188,7 @@
 
         autosize($('#' + this.config.textAreaEditTaskId));
         this.$input.val('');
-        this.$input.css('height', '34px');
+        this.$input.css('height', oneRowHeightTextArea);
         this.$btnAdd.prop('disabled', true);
         this.showMessage();
     }
@@ -209,6 +211,7 @@
     function cancelTask(str) {
         this.createTaskHtml(str).prependTo(this.$todoList);
         autosize($('#' + this.config.textAreaEditTaskId));
+        this.$input.focus();
     }
 
     /**
@@ -218,19 +221,18 @@
     function updateKeyUp(e) {
         var state = this.getCurrentStateTask();
 
-        var str = state.$task.text();
-        var editStr = state.$editTask.val().trim();
-        // disabled edit button
+        var currentText = state.$task.text();
+        var inputText = state.$editTask.val().trim();
+        // disabled update button
         state.$btnUpdateTask.prop('disabled', true);
 
-        if (editStr === '') {
+        if (inputText === '') {
             state.$btnUpdateTask.prop('disabled', true);
             return;
         }
 
-        if (str != editStr) {
+        if (currentText != inputText) {
             state.$btnUpdateTask.prop('disabled', false);
-
         }
 
         if (e.ctrlKey && e.keyCode === enterBtnKeyCode) {
