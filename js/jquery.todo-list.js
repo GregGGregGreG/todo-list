@@ -138,6 +138,17 @@
         this.$btnAdd = $('#' + this.config.btnAddId).prop('disabled', true);
         this.$messageUser = $('#' + this.config.messageUserId).hide();
         this.$todoList = $('#' + this.config.todoListId);
+
+        var thisObj = this;
+        $.ajax({
+            type:'GET',
+            url: "http://localhost:8080/greeting",
+            success: function (data) {
+                var str = JSON.stringify(data.content);
+                console.log(str);
+                thisObj.addTask(str);
+            }
+        })
     }
 
     /**

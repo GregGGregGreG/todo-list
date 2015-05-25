@@ -100,11 +100,11 @@
 }
 
 .glyphicon.glyphicon-remove{
-    color: #777;
+    color: #ffaeac;
 
 }
 .glyphicon.glyphicon-remove:hover{
-    color: #322a2e;
+    color: #ff464a;
 }
 
 #btn-done {
