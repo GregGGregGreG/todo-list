@@ -322,6 +322,8 @@
      * Destroy task.
      */
     function destroy() {
+        $('[data-toggle="tooltip"]').tooltip('hide');
+
         var thisObj = this;
         var li = $(event.target).closest('li');
         $('#' + this.config.modalWindowDestroyTaskId).modal('show').on('click',
