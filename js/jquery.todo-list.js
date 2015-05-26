@@ -197,6 +197,8 @@
         var str = ($.type(input) === 'string') ? input : this.$input.val();
         this.createTaskHtml(str).prependTo(this.$todoList);
 
+        $('[data-toggle="tooltip"]').tooltip({delay: { "show": 500, "hide": 100 },container: 'body'});
+
         autosize($('#' + this.config.textAreaEditTaskId));
         this.$input.val('');
         this.$input.css('height', oneRowHeightTextArea);
@@ -211,6 +213,8 @@
      */
     function addDoneTask(str) {
         this.createDoneTaskHtml(str).appendTo(this.$todoList);
+        $('[data-toggle="tooltip"]').tooltip({delay: { "show": 500, "hide": 100 },container: 'body'});
+
         this.$input.focus();
     }
 

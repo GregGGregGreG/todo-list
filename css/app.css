@@ -11,7 +11,6 @@
     font-size: 14px;
     font-weight: 300;
     line-height: 1.5;
-    font-family: "Roboto", sans-serif;
 }
 
 /* content */
@@ -36,7 +35,8 @@
 .primary-header__title {
     color: #393939;
     font-size: 36px;
-    }
+}
+
 .primary-header__title small {
     font-size: 18px;
     color: #898989;
