@@ -30,7 +30,7 @@
 <footer class="primary-footer">
     <div class="container">
         <div class="input-line"></div>
-        <small>&copy; 2015 Todo-List<br> Demo by <a href="https://github.com/GregGGregGreG">TrueGreG</a></small>
+        <small>&copy; 2015 Todo-List<br> Demo by  <span class="github-logo"></span><a href="https://github.com/GregGGregGreG">  TrueGreG</a></small>
     </div>
 </footer>
 <div class="modal fade bs-example-modal-sm" id="destroyTaskModal" tabindex="-1" role="dialog"
@@ -53,7 +53,8 @@
         <textarea id='${inputId}' class='form-control' placeholder='What do you have in mind this time?'rows='1'/></textarea>
         <button id='${btnAddId}' class='btn btn-success btn-sm '><strong>ADD</strong></button>
     </div>
-    <h3 id='${messageUserId}' class='text-center'>You Todo - list is empty! Please add task.<br><small>Enter a new task, and then click Add or Ctrl+Enter.</small></h3>
+    <h3 id='${messageUserId}' class='text-center desc'>You Todo - list is empty! Please add task.<br>
+    <small>Enter a new task, and then click Add or <strong class='text-primary'>Ctrl+Enter</strong></small></h3>
     <ul id='${todoListId}' class='${todoListClass}'></ul>
 
 </script>

@@ -50,3 +50,8 @@
     text-align: center;
 }
 
+.github-logo {
+    content: url(../images/GitHub-Mark-32px.png);
+    height: 12px;
+    width: 12px;
+}
